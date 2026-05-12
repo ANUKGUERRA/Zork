@@ -3,7 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-
+#include <cstdlib>
 
 #include "World.h"
 
@@ -22,6 +22,14 @@ std::vector<std::string> tokenize(const std::string& input) {
 	return tokens;
 }
 
+void clearConsole()
+{
+#ifdef _WIN32
+	system("cls");
+#else
+	system("clear");
+#endif
+}
 
 int main()
 {
@@ -37,6 +45,7 @@ int main()
 		if (tokens.empty()) continue;
 		if (tokens[0] == "quit" || tokens[0] == "exit") break;
 
+		clearConsole();
 		if (!world.HandleInput(tokens)) 
 		{
 			std::cout << "Try a diferent sentence" << std::endl;
