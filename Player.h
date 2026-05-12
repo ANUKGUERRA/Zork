@@ -8,7 +8,7 @@ public:
 
 
     static constexpr int MAX_HANDS = 2;
-    bool HandsUsed() const;
+    int HandsUsed() const;
 
     bool Look(const std::string& parameter);
     bool Go(const std::string& parameter);

@@ -16,12 +16,12 @@ Player::~Player()
 
 
 //Helpers
-bool Player::HandsUsed() const
+int Player::HandsUsed() const
 {
     int count = 0;
     for (Entity* e : m_contains)
         if (e->type == Types::Item) ++count;
-    return count > 1;
+    return count;
 }
 
 static Item* FindItemIn(Entity* container, const std::string& name)
@@ -62,6 +62,11 @@ bool Player::Look(const std::string& parameter)
                 std::cout << "\n" << exit->GetDestinationFrom(m_owner)->m_name << ": " << exit->GetDestinationFrom(m_owner)->m_description << "\n\n";
                 return true;
             }
+        }
+        else if (e->type == Types::Item) 
+        {
+            std::cout << "\n" << e->m_name << ": " << e->m_description << "\n\n";
+            return true;
         }
     }
 
@@ -127,6 +132,8 @@ bool Player::Go(const std::string& direction)
 
 bool Player::Take(const std::string& parameter)
 {
+
+    //TODO: Take items from npc, take items from container items
     if (parameter.empty())
     {
         std::cout << "Take what?\n";
@@ -138,6 +145,15 @@ bool Player::Take(const std::string& parameter)
         std::cout << "Your hands are full. Drop something first.\n";
         return false;
     }
+
+    Item* item = FindItemIn(m_owner, parameter);
+    if (item)
+    {
+        TransferItem(item, m_owner, this);
+        std::cout << "You pick up the " << item->m_name << ".\n";
+        return true;
+    }
+
 
     return false;
 }
