@@ -19,7 +19,15 @@ public:
 
 	inline bool CompareName(std::string& name) 
 	{
-		return name == m_name;
+		if (name.length() != m_name.length())
+			return false;
+
+		for (int i = 0; i < name.length(); ++i) {
+			if (tolower(m_name[i]) != tolower(m_name[i]))
+				return false;
+		}
+
+		return true;
 	}
 
 
