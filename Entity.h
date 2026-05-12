@@ -23,7 +23,7 @@ public:
 			return false;
 
 		for (int i = 0; i < name.length(); ++i) {
-			if (tolower(m_name[i]) != tolower(m_name[i]))
+			if (tolower(m_name[i]) != tolower(name[i]))
 				return false;
 		}
 
