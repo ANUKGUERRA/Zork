@@ -2,34 +2,45 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
-std::vector<std::string> tokenize(std::string input) {
+
+#include "World.h"
+
+std::vector<std::string> tokenize(const std::string& input) {
 	std::stringstream ssInput(input);
 	std::vector<std::string> tokens;
 	std::string token;
-	char delimeter = ' ';
-	while (std::getline(ssInput, token, delimeter))
+	while (std::getline(ssInput, token, ' '))
 	{
-		tokens.push_back(token);
+		if (!token.empty())
+		{
+			std::transform(token.begin(), token.end(), token.begin(), ::tolower);
+			tokens.emplace_back(token);
+		}
 	}
 	return tokens;
 }
 
+
 int main()
 {
 	std::string input;
-	std::stringstream chartInput;
+
+	World world;
 
 	while (true)
 	{
-		std::cin >> input;
+		std::getline(std::cin, input);
 		std::vector<std::string> tokens = tokenize(input);
 
-		if (tokens.size() > 0 && tokens[0] == "quit")
-			break;
+		if (tokens.empty()) continue;
+		if (tokens[0] == "quit" || tokens[0] == "exit") break;
 
-
-
+		if (!world.HandleInput(tokens)) 
+		{
+			std::cout << "Try a diferent sentence" << std::endl;
+		}
 	}
 
 	std::cout << "Thanks for playing!" << std::endl;
