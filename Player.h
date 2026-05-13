@@ -1,5 +1,7 @@
 #pragma once
 #include "Entity.h"
+#include "Item.h"
+#include "NPC.h"
 class Player : public Entity 
 {
 public:
@@ -13,6 +15,16 @@ public:
     bool Look(const std::string& parameter);
     bool Go(const std::string& parameter);
     bool Take(const std::string& parameter);
+    bool Drop(const std::string& parameter);
     bool Talk(const std::string& parameter);
+    bool Open(const std::string& parameter);
+    bool Close(const std::string& parameter);
+
+    Container* m_openContainer = nullptr;
+
+private:
+    void CloseContainer();
+
+
 };
 

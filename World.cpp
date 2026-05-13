@@ -47,7 +47,7 @@ World::World()
 		"...Where did you find that?"
 	};
 
-	Item* detectiveBadge = new Item("detective badge", "A worn brass badge identifying its owner as a private detective.", player);
+	Item* detectiveBadge = new Item("detective_badge", "A worn brass badge identifying its owner as a private detective.", player);
 	NPC* elisa = new NPC("Elisa", "A frightened maid avoiding eye contact.", library, detectiveBadge, 1, true);
 	elisa->defaultDialogue =
 	{
