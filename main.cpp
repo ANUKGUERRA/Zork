@@ -33,9 +33,8 @@ void clearConsole()
 
 int main()
 {
+	World& world = World::GetInstance();
 	std::string input;
-
-	World world;
 
 	while (true)
 	{
@@ -46,7 +45,7 @@ int main()
 		if (tokens[0] == "quit" || tokens[0] == "exit") break;
 
 		clearConsole();
-		if (!world.HandleInput(tokens)) 
+		if (!world.HandleInput(tokens))
 		{
 			std::cout << "Try a diferent sentence" << std::endl;
 		}
