@@ -48,4 +48,8 @@ int main()
 	}
 
 	std::cout << "Thanks for playing!" << std::endl;
+
+
+	std::cout << "Press any key to close!" << std::endl;
+	std::cin.get();
 }
