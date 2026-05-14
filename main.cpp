@@ -24,11 +24,7 @@ std::vector<std::string> tokenize(const std::string& input) {
 
 void clearConsole()
 {
-#ifdef _WIN32
 	system("cls");
-#else
-	system("clear");
-#endif
 }
 
 int main()
@@ -36,7 +32,7 @@ int main()
 	World& world = World::GetInstance();
 	std::string input;
 
-	while (true)
+	while (!world.mysterySolved)
 	{
 		std::getline(std::cin, input);
 		std::vector<std::string> tokens = tokenize(input);

@@ -34,6 +34,7 @@ public:
     bool CheckWinCondition();
 
     std::unordered_set<std::string> flags;
+    bool mysterySolved = false;
 
 private:
     World();
