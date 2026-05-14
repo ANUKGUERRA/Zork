@@ -43,6 +43,15 @@ static void TransferItem(Entity* entity, Entity* from, Entity* to)
     entity->m_owner = to;
 }
 
+static void CheckItemFlags(const std::string& itemName)
+{
+    World& w = World::GetInstance();
+    if (itemName == "diary_page")   w.AddFlag("found_diary");
+    if (itemName == "poison_bottle")w.AddFlag("found_poison");
+    if (itemName == "bloody_key")   w.AddFlag("has_key");
+}
+
+
 
 void Player::CloseContainer()
 {
@@ -194,7 +203,15 @@ bool Player::Take(const std::string& parameter)
                 return false;
             }
             TransferItem(item, m_openContainer, this);
-            std::cout << " Gives you the " << item->m_name << "\n";
+            if (m_openContainer->type == Types::Npc) 
+            {
+                std::cout << " Gives you the " << item->m_name << "\n";
+            }
+            else if(m_openContainer->type == Types::Item)
+            {
+                std::cout << " You take the " << item->m_name << "\n";
+            }
+            CheckItemFlags(item->m_name);
             return true;
         }
         std::cout << "There's no \"" << parameter << "\" in the "
@@ -214,6 +231,7 @@ bool Player::Take(const std::string& parameter)
 
         TransferItem(item, m_owner, this);
         std::cout << "You pick up the " << item->m_name << "\n";
+                    CheckItemFlags(item->m_name);
         return true;
     }
     else
@@ -262,51 +280,85 @@ bool Player::Drop(const std::string& parameter)
 
 bool Player::Talk(const std::string& parameter)
 {
-
-
-    for (Entity* e : m_owner->m_contains) 
+    if (parameter.empty())
     {
-        if (e->type == Types::Npc && e->CompareName(const_cast<std::string&>(parameter)))
+        std::cout << "Talk to who?\n";
+        return false;
+    }
+
+
+    for (Entity* e : m_owner->m_contains)
+    {
+        if (e->type != Types::Npc) continue;
+        if (!e->CompareName(const_cast<std::string&>(parameter))) continue;
+
+        NPC* npc = static_cast<NPC*>(e);
+
+
+        if (npc->IsContainer() && npc->IsLocked())
         {
+            Item* matchingKey = nullptr;
+            for (Entity* inv : m_contains)
+                if (inv == npc->m_key) { matchingKey = static_cast<Item*>(inv); break; }
 
-            NPC* npc = static_cast<NPC*>(e);
-
-            if (npc->IsContainer())
+            if (matchingKey)
             {
-                Item* matchingKey = nullptr;
-                for (Entity* e : m_contains)
-                    if (e == npc->m_key) { matchingKey = static_cast<Item*>(e); break; }
-
-                if (matchingKey)
-                {
-                    std::cout << "Unlocked npc" << std::endl;
-                    npc->Unlock();
-                    m_openContainer = npc;
-                }
+                npc->Unlock();
+                m_openContainer = npc;
+                std::cout << "(Showing your " << matchingKey->m_name
+                    << ", " << npc->m_name << " trusts you.)\n";
             }
-            for (auto& pair : npc->conditionalDialogue)
+        }
+        else if (npc->IsContainer() && !npc->IsLocked())
+        {
+            m_openContainer = npc;
+        }
+
+        World& w = World::GetInstance();
+        if (parameter == "marcus")
+        {
+            bool hasLetter = false;
+            bool hasPosion = false;
+            for (Entity* inv : m_contains)
             {
-                if (World::GetInstance().HasFlag(pair.first))
+                if (inv->m_name == "letter")        hasLetter = true;
+                if (inv->m_name == "poison_bottle") hasPosion = true;
+                if (hasLetter && hasPosion)         break;
+            }
+
+
+            if (hasLetter && hasPosion)
+            {
+                w.mysterySolved = true;
+                auto it = npc->conditionalDialogue.find("confronted");
+                if (it != npc->conditionalDialogue.end())
                 {
-                    for (const auto& line : pair.second)
-                    {
+                    for (const auto& line : it->second)
                         std::cout << npc->m_name << ": " << line << "\n";
-                    }
                     return true;
                 }
             }
-
-
-            for (const auto& line : npc->defaultDialogue)
-            {
-                std::cout << npc->m_name << ": " << line << "\n";
-            }
-            return true;
         }
+        for (auto& pair : npc->conditionalDialogue)
+        {
+            if (w.HasFlag(pair.first))
+            {
+                for (const auto& line : pair.second)
+                    std::cout << npc->m_name << ": " << line << "\n";
+                return true;
+            }
+        }
+
+        for (const auto& line : npc->defaultDialogue)
+            std::cout << npc->m_name << ": " << line << "\n";
+
+        return true;
     }
-    std::cout << "You can't talk to: "<< parameter << "\n";
+
+    std::cout << "There's nobody called \"" << parameter << "\" here.\n";
     return false;
 }
+
 
 bool Player::Open(const std::string& parameter)
 {
